@@ -1,6 +1,5 @@
 
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
 
 namespace Dewy
 {
@@ -8,10 +7,9 @@ namespace Dewy
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            // to do - create interface for ApiClientServices 
             services.AddSingleton<OpenWeatherMapController>();
-            services.AddScoped<HttpClient>();
-            
-
+            services.AddHttpClient<OpenWeatherMapController>();
         }
 
     }
