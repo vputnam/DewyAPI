@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "dewyAPI": {
+    "DewyAPI": {
       "commandName": "Project",
-      "commandLineArgs": "--port 7222",
+      "commandLineArgs": "--port 7204",
       "launchBrowser": false
     }
   }

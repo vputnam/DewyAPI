@@ -1,8 +1,9 @@
 using System;
 using System.Net.Http;
-using System.Text;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Dewy
 {
@@ -36,18 +37,22 @@ namespace Dewy
             queryParams.Add("appid", OpenWeatherMapKey);
 
             // Build the complete URL with query parameters
-            var uriBuilder = new UriBuilder("/endpoint");
+            var uriBuilder = new UriBuilder(OpenWeatherMapURL);
             uriBuilder.Query = string.Join("&", queryParams.AllKeys
                 .Select(key => $"{key}={System.Web.HttpUtility.UrlEncode(queryParams[key])}"));
-
             return uriBuilder.Uri;
 
         }
 
-        public async void GetTemperature(string lat, string lon)
+        public async Task<string> GetTemperature(string lat, string lon)
         {
-            Uri tempUri = BuildOpenWeatherMapUri();
-            var result = await _httpClient.GetAsync(tempUri).ConfigureAwait(false);
+            Uri tempUri = BuildOpenWeatherMapUri(); // is this a good way of initalising? 
+            // var result = await _httpClient.GetAsync(tempUri).ConfigureAwait(false);
+            // string jsonString = JsonSerializer.Serialize(result);
+            // OneCallResponse oneCallResponse = JsonSerializer.Deserialize<OneCallResponse>(jsonString);
+
+            return tempUri.AbsolutePath;
+
         }
 
     }
