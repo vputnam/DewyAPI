@@ -9,6 +9,8 @@ namespace Dewy
     {
         private readonly ILogger _logger;
 
+        private readonly OpenWeatherMapController openWeatherMapController;
+
         public HttpDewyTrigger(ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger<HttpDewyTrigger>();
@@ -21,6 +23,10 @@ namespace Dewy
 
             var lat = req.Query["lat"];
             var lon = req.Query["long"];
+
+            string systemURI = await openWeatherMapController.GetTemperature(lat, lon);
+
+            _logger.LogInformation(systemURI);
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
