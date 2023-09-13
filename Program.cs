@@ -1,7 +1,14 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Dewy;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults()
-    .Build();
+.ConfigureFunctionsWorkerDefaults()
+.ConfigureServices(s =>
+{
+    s.AddScoped<OpenWeatherMapController>();
+    s.AddHttpClient<OpenWeatherMapController>();
+})
+.Build();
 
-host.Run();
+await host.RunAsync();
