@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -9,10 +10,11 @@ namespace Dewy
     {
         private readonly ILogger _logger;
 
-        private readonly OpenWeatherMapController openWeatherMapController;
+        private readonly IOpenWeatherMapController _openWeatherMapController;
 
-        public HttpDewyTrigger(ILoggerFactory loggerFactory)
+        public HttpDewyTrigger(ILoggerFactory loggerFactory, IOpenWeatherMapController openWeatherMapController)
         {
+            _openWeatherMapController = openWeatherMapController;
             _logger = loggerFactory.CreateLogger<HttpDewyTrigger>();
         }
 
@@ -24,9 +26,9 @@ namespace Dewy
             var lat = req.Query["lat"];
             var lon = req.Query["long"];
 
-            string systemURI = await openWeatherMapController.GetTemperature(lat, lon);
+            var systemURI = await _openWeatherMapController.GetTemperature(lat, lon).ConfigureAwait(false);
 
-            _logger.LogInformation(systemURI);
+            _logger.LogInformation(systemURI.ToString());
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");

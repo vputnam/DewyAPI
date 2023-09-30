@@ -4,27 +4,24 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Dewy
 {
-    public class OpenWeatherMapController
+    public class OpenWeatherMapController : IOpenWeatherMapController
     {
-        private readonly string OpenWeatherMapURL = Environment.GetEnvironmentVariable("OPEN_WEATHER_MAP_KEY");
-        private readonly string OpenWeatherMapKey = Environment.GetEnvironmentVariable("OPEN_WEATHER_MAP_URL");
-        private readonly HttpClient _httpClient;
-        private string lat;
-        private string lon;
-        private const string units = "imperial"; 
-
-        public OpenWeatherMapController(HttpClient httpClient, string lat, string lon)
+        private readonly string OpenWeatherMapURL;  
+        private readonly string OpenWeatherMapKey; 
+        private const string units = "imperial";
+        private HttpClient httpClient;
+        public OpenWeatherMapController(HttpClient httpClient)
         {
-            this._httpClient = httpClient;
-            this.lat = lat;
-            this.lon = lon;
-            _httpClient.BaseAddress = new Uri(OpenWeatherMapURL);
+            this.httpClient = httpClient;
+            OpenWeatherMapURL = Environment.GetEnvironmentVariable("OPEN_WEATHER_MAP_URL");
+            OpenWeatherMapKey = Environment.GetEnvironmentVariable("OPEN_WEATHER_MAP_KEY");
         }
 
-        private Uri BuildOpenWeatherMapUri()
+        private Uri BuildOpenWeatherMapUri(string lat, string lon)
         {
             var queryParams = new NameValueCollection();
 
@@ -37,21 +34,21 @@ namespace Dewy
             queryParams.Add("appid", OpenWeatherMapKey);
 
             // Build the complete URL with query parameters
-            var uriBuilder = new UriBuilder(OpenWeatherMapURL);
+            UriBuilder uriBuilder = new UriBuilder(OpenWeatherMapURL);
             uriBuilder.Query = string.Join("&", queryParams.AllKeys
                 .Select(key => $"{key}={System.Web.HttpUtility.UrlEncode(queryParams[key])}"));
             return uriBuilder.Uri;
-
+ 
         }
 
-        public async Task<string> GetTemperature(string lat, string lon)
+        public async Task<OneCallResponse> GetTemperature(string lat, string lon)
         {
-            Uri tempUri = BuildOpenWeatherMapUri(); // is this a good way of initalising? 
-            // var result = await _httpClient.GetAsync(tempUri).ConfigureAwait(false);
-            // string jsonString = JsonSerializer.Serialize(result);
-            // OneCallResponse oneCallResponse = JsonSerializer.Deserialize<OneCallResponse>(jsonString);
+            Uri tempUri = BuildOpenWeatherMapUri(lat, lon);  
+            var result = await httpClient.GetAsync(tempUri).ConfigureAwait(false);
+            string jsonString = JsonSerializer.Serialize(result);
+            OneCallResponse oneCallResponse = JsonSerializer.Deserialize<OneCallResponse>(jsonString);
 
-            return tempUri.AbsolutePath;
+            return oneCallResponse;
 
         }
 

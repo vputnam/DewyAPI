@@ -6,8 +6,8 @@ var host = new HostBuilder()
 .ConfigureFunctionsWorkerDefaults()
 .ConfigureServices(s =>
 {
-    s.AddScoped<OpenWeatherMapController>();
-    s.AddHttpClient<OpenWeatherMapController>();
+    s.AddSingleton<IOpenWeatherMapController, OpenWeatherMapController>();
+    s.AddHttpClient<IOpenWeatherMapController, OpenWeatherMapController>();
 })
 .Build();
 
